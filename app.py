@@ -39,9 +39,40 @@ def ticket(ticket_id):
     return render_template("ticket.html", ticket_id=ticket_id)
 
 
-@app.route("/join")
+@app.get("/join")
 def join_form():
-    return render_template("join.html")
+    return render_template("join.html", services=SERVICES, form={}, errors={})
+
+
+@app.post("/join")
+def join():
+    form = request.form
+    name = form.get("name", "").strip()
+    email = form.get("email", "").strip().lower()
+    service_id = form.get("service_id", type=int)
+    party_size = form.get("party_size", type=int)
+
+    errors = {}
+    if not name:
+        errors["name"] = "Enter your name."
+    if "@" not in email or "." not in email:
+        errors["email"] = "Enter a valid email address."
+    if service_id not in [s["id"] for s in SERVICES]:
+        errors["service_id"] = "Choose a service."
+    if party_size is None or not 1 <= party_size <= 10:
+        errors["party_size"] = "Enter a party size from 1 to 10."
+
+    if errors:
+        flash("Please fix the highlighted fields.", "danger")
+        return render_template("join.html", services=SERVICES, form=form,
+                               errors=errors), 400
+
+    number = TICKETS[-1]["number"] + 1 if TICKETS else 1
+    TICKETS.append({"number": number, "name": name, "email": email,
+                    "service_id": service_id, "party_size": party_size,
+                    "status": "waiting"})
+    flash(f"You joined the queue. Your ticket is #{number}.", "success")
+    return redirect(url_for("ticket", ticket_id=number))
 
 
 @app.route("/staff")
