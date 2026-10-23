@@ -37,7 +37,7 @@ Sandy arrives at the robinsons mall in iligan at 10:00am, even at early arival t
 
 | | |
 | --- | --- |
-| **Photo or sketch** | ![Wanda, the staff member](wanda.jng) |
+| **Photo or sketch** | ![Wanda, the staff member](Wanda.jpg) |
 | **Age, role and background** | 35, cashier at the cinema ticket booth, works long shifts |
 | **Goals** | 	Keep the line moving; serve people in the right order; responding to people complaints   |
 | **Frustrations** | people crowd the booth, people skip ahead, no clear order, people are complaining |
