@@ -1,9 +1,55 @@
 {% extends "base.html" %}
-
-{% block title %}Ticket #{{ ticket_id }} · CinemaTicketQ{% endblock %}
+{% block title %}Ticket #{{ ticket.number }} · CinemaTicketQ{% endblock %}
 
 {% block content %}
-  <h2>Ticket #{{ ticket_id }}</h2>
-  <p>This page was built from the URL <code>/queue/{{ ticket_id }}</code>.</p>
-  <p><a href="{{ url_for('index') }}">&larr; Back to the queue</a></p>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="card text-center shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h5 text-body-secondary mb-1">Your ticket</h1>
+        <p class="display-1 fw-bold mb-1">#{{ ticket.number }}</p>
+        <p class="mb-3">{{ service.name }} · party of {{ ticket.party_size }}</p>
+
+        <div id="live-status" aria-live="polite">
+          <p class="mb-2">
+            {% if ticket.status == "waiting" %}
+              <span id="status-badge" class="badge text-bg-warning fs-5">Waiting</span>
+            {% elif ticket.status == "called" %}
+              <span id="status-badge" class="badge text-bg-success fs-5">Called</span>
+            {% elif ticket.status == "served" %}
+              <span id="status-badge" class="badge text-bg-secondary fs-5">Served</span>
+            {% else %}
+              <span id="status-badge" class="badge text-bg-danger fs-5">No-show</span>
+            {% endif %}
+          </p>
+
+          <p id="position-text" class="fs-4 mb-1">
+            {% if ticket.status == "called" %}
+              Please go to the booth now.
+            {% elif ticket.status in ("served", "no-show") %}
+              This ticket is closed.
+            {% elif ahead == 0 %}
+              You're next!
+            {% else %}
+              {{ ahead }} {{ "person" if ahead == 1 else "people" }} ahead of you
+            {% endif %}
+          </p>
+
+          {% if ticket.status == "waiting" %}
+            <p id="wait-text" class="text-body-secondary">
+              About {{ wait_minutes }} minutes
+            </p>
+          {% endif %}
+        </div>
+
+        {% if ticket.status in ("waiting", "called") %}
+          <form method="post" action="{{ url_for('leave_queue', ticket_id=ticket.number) }}"
+                class="mt-4">
+            <button type="submit" class="btn btn-outline-danger">Leave the queue</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
