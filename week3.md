@@ -223,9 +223,9 @@ Update your wireframes with the changes before you start Part 4.
 
 **Checkpoint 3**
 
-- [ ] `docs/week3/feedback.md` has a review of all three screens in the *Works well / Problem / Change* format.
-- [ ] Your wireframes are updated, or `feedback.md` explains why you kept them.
-- [ ] Committed.
+- [x] `docs/week3/feedback.md` has a review of all three screens in the *Works well / Problem / Change* format.
+- [x] Your wireframes are updated, or `feedback.md` explains why you kept them.
+- [x] Committed.
 
 ---
 
