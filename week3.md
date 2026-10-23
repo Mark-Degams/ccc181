@@ -331,9 +331,9 @@ Make the home page (`index.html`) a short welcome for the person waiting: your a
 **Checkpoint 4**
 
 - [x] Every page shows the navbar, flash area and footer from `base.html`.
-- [ ] In Chrome DevTools device mode (Ctrl+Shift+M), at 375 px wide the menu collapses into ☰ and opens when tapped.
-- [ ] The active page is highlighted in the menu.
-- [ ] Committed: `git commit -m "Add Bootstrap layout and navigation (#<issue>)"`
+- [X] In Chrome DevTools device mode (Ctrl+Shift+M), at 375 px wide the menu collapses into ☰ and opens when tapped.
+- [X] The active page is highlighted in the menu.
+- [X] Committed: `git commit -m "Add Bootstrap layout and navigation (#<issue>)"`
 
 ---
 
@@ -434,10 +434,10 @@ What to notice:
 
 **Checkpoint 5**
 
-- [ ] Submitting an empty form shows a red alert and a message under each wrong field, and keeps the typed values.
-- [ ] A valid submission redirects to My place with a green success alert.
-- [ ] At least one field specific to your setting is in the form and validated on the server.
-- [ ] Committed.
+- [x] Submitting an empty form shows a red alert and a message under each wrong field, and keeps the typed values.
+- [x] A valid submission redirects to My place with a green success alert.
+- [x] At least one field specific to your setting is in the form and validated on the server.
+- [x] Committed.
 
 ---
 
