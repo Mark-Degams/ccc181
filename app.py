@@ -95,9 +95,49 @@ def join():
     return redirect(url_for("ticket", ticket_id=number))
 
 
-@app.route("/staff")
+@app.get("/staff")
 def staff_dashboard():
-    return "Staff dashboard coming soon"
+    service_id = request.args.get("service_id", type=int)
+    queue = [t for t in TICKETS if t["status"] in ("waiting", "called")]
+    waiting_counts = {
+        s["id"]: sum(1 for t in queue
+                     if t["service_id"] == s["id"] and t["status"] == "waiting")
+        for s in SERVICES
+    }
+    total_waiting = sum(waiting_counts.values())
+    if service_id:
+        queue = [t for t in queue if t["service_id"] == service_id]
+    names = {s["id"]: s["name"] for s in SERVICES}
+    return render_template("staff.html", queue=queue, services=SERVICES,
+                           names=names, selected=service_id,
+                           waiting_counts=waiting_counts,
+                           total_waiting=total_waiting)
+
+
+@app.post("/staff/call-next")
+def call_next():
+    service_id = request.form.get("service_id", type=int)
+    nxt = next((t for t in TICKETS
+                if t["status"] == "waiting"
+                and (not service_id or t["service_id"] == service_id)), None)
+    if nxt is None:
+        flash("No one is waiting.", "warning")
+    else:
+        nxt["status"] = "called"
+        flash(f"Calling ticket #{nxt['number']} ({nxt['name']}).", "info")
+    return redirect(url_for("staff_dashboard", service_id=service_id))
+
+
+@app.post("/staff/tickets/<int:ticket_id>/<action>")
+def staff_action(ticket_id, action):
+    new_status = {"serve": "served", "no-show": "no-show"}.get(action)
+    t = next((t for t in TICKETS if t["number"] == ticket_id), None)
+    if t is None or new_status is None:
+        abort(404)
+    t["status"] = new_status
+    flash(f"Ticket #{ticket_id} marked {new_status}.", "info")
+    service_id = request.form.get("service_id", type=int)
+    return redirect(url_for("staff_dashboard", service_id=service_id))
 
 
 if __name__ == "__main__":
