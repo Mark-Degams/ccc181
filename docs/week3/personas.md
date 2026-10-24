@@ -4,7 +4,7 @@
 
 | | |
 | --- | --- |
-| **Photo or sketch** | ![Sandy, the person waiting](Sandy.jpg) |
+| **Photo or sketch** | ![Sandy, the person waiting](personas/Sandy.jpg) |
 | **Age, role and background** | 21, 3rd year BS Physics, Cinema Lover |
 | **Goals** | Get tickets for a showing without standing in a long line; know roughly when her turn is; use the mall time (food, shopping) while waiting for the queue |
 | **Frustrations** | The line at Robinsons Iligan Movie World can take about an hour on cinema days (observation); cannot leave the line in case of urgent calls such as needing to pee , unsure how long the line it will take |
@@ -37,7 +37,7 @@ Sandy arrives at the robinsons mall in iligan at 10:00am, even at early arival t
 
 | | |
 | --- | --- |
-| **Photo or sketch** | ![Wanda, the staff member](Wanda.jpg) |
+| **Photo or sketch** | ![Wanda, the staff member](personas/Wanda.jpg) |
 | **Age, role and background** | 35, cashier at the cinema ticket booth, works long shifts |
 | **Goals** | 	Keep the line moving; serve people in the right order; responding to people complaints   |
 | **Frustrations** | people crowd the booth, people skip ahead, no clear order, people are complaining |
