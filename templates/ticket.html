@@ -35,15 +35,15 @@
             {% endif %}
           </p>
 
-          {% if ticket.status == "waiting" %}
-            <p id="wait-text" class="text-body-secondary">
-              About {{ wait_minutes }} minutes
-            </p>
-          {% endif %}
+          <p id="wait-text" class="text-body-secondary"
+             {% if ticket.status != "waiting" %}hidden{% endif %}>
+            About {{ wait_minutes }} minutes
+          </p>
         </div>
 
         {% if ticket.status in ("waiting", "called") %}
-          <form method="post" action="{{ url_for('leave_queue', ticket_id=ticket.number) }}"
+          <form id="leave-form" method="post"
+                action="{{ url_for('leave_queue', ticket_id=ticket.number) }}"
                 class="mt-4">
             <button type="submit" class="btn btn-outline-danger">Leave the queue</button>
           </form>
@@ -52,4 +52,51 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const statusUrl = "{{ url_for('ticket_status', ticket_id=ticket.number) }}";
+  const BADGES = {
+    "waiting": ["text-bg-warning", "Waiting"],
+    "called": ["text-bg-success", "Called"],
+    "served": ["text-bg-secondary", "Served"],
+    "no-show": ["text-bg-danger", "No-show"]
+  };
+
+  function positionText(d) {
+    if (d.status === "called") return "Please go to the booth now.";
+    if (d.status === "served" || d.status === "no-show") return "This ticket is closed.";
+    if (d.ahead === 0) return "You're next!";
+    return `${d.ahead} ${d.ahead === 1 ? "person" : "people"} ahead of you`;
+  }
+
+  async function refreshStatus() {
+    try {
+      const res = await fetch(statusUrl);
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const [cls, label] = BADGES[data.status];
+      const badge = document.getElementById("status-badge");
+      badge.className = `badge ${cls} fs-5`;
+      badge.textContent = label;
+
+      document.getElementById("position-text").textContent = positionText(data);
+
+      const wait = document.getElementById("wait-text");
+      wait.hidden = data.status !== "waiting";
+      wait.textContent = `About ${data.wait_minutes} minutes`;
+
+      const leave = document.getElementById("leave-form");
+      if (leave && (data.status === "served" || data.status === "no-show")) {
+        leave.hidden = true;
+      }
+    } catch (err) {
+      console.warn("Could not refresh status", err);
+    }
+  }
+
+  setInterval(refreshStatus, 10000);
+</script>
 {% endblock %}
