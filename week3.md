@@ -193,10 +193,10 @@ Save the files as `docs/week3/wireframes/` (PNG, JPG or PDF), for example `join-
 
 **Checkpoint 2**
 
-- [ ] Six frames: three screens, each at phone and laptop width.
-- [ ] Every frame names the persona, the device, and the requirement IDs.
-- [ ] The main flow for each persona is marked with arrows.
-- [ ] Committed in `docs/week3/wireframes/`.
+- [x] Six frames: three screens, each at phone and laptop width.
+- [x] Every frame names the persona, the device, and the requirement IDs.
+- [x] The main flow for each persona is marked with arrows.
+- [x] Committed in `docs/week3/wireframes/`.
 
 ---
 
@@ -701,8 +701,8 @@ Commit it: `git commit -m "Add Week 3 report (#<issue>)"`. Then open your branch
 
 **Checkpoint 10 (submission)**
 
-- [ ] Usability test notes and the improvement are in `docs/week3/usability-test.md`.
-- [ ] `docs/week3/report.md` is in your repository and displays correctly on GitHub.
+- [x] Usability test notes and the improvement are in `docs/week3/usability-test.md`.
+- [x] `docs/week3/report.md` is in your repository and displays correctly on GitHub.
 - [ ] Your pull request is **merged** into `main` and tagged `week3`.
 - [ ] The link to your report at the `week3` tag is submitted to the **Week 3 assignment on MOLE** before the due date.
 
@@ -767,13 +767,13 @@ Late work follows the late policy in the course syllabus.
 
 ## Checklist before you submit
 
-- [ ] My app shows my own system's name, services and fields, not ClinicQ's.
-- [ ] `docs/week3/personas.md` has my two personas, each with a real quote, scenario, top tasks and design rules.
-- [ ] Six wireframes are in `docs/week3/wireframes/`, and `feedback.md` has my self-review of all three screens.
-- [ ] Join, My place and Staff dashboard all work, on a phone width and a laptop width.
-- [ ] The join form validates every field on the server and keeps the user's input on error.
-- [ ] Staff actions use POST forms, and My place updates by itself within 10 seconds.
-- [ ] `accessibility.md` has Lighthouse scores, keyboard notes and the checklist.
-- [ ] `usability-test.md` has a real user's results and one improvement with before and after.
+- [x] My app shows my own system's name, services and fields, not ClinicQ's.
+- [x] `docs/week3/personas.md` has my two personas, each with a real quote, scenario, top tasks and design rules.
+- [x] Six wireframes are in `docs/week3/wireframes/`, and `feedback.md` has my self-review of all three screens.
+- [x] Join, My place and Staff dashboard all work, on a phone width and a laptop width.
+- [x] The join form validates every field on the server and keeps the user's input on error.
+- [x] Staff actions use POST forms, and My place updates by itself within 10 seconds.
+- [x] `accessibility.md` has Lighthouse scores, keyboard notes and the checklist.
+- [x] `usability-test.md` has a real user's results and one improvement with before and after.
 - [ ] My pull request is merged into `main` and tagged `week3`.
-- [ ] `docs/week3/report.md` is in my repository with my PR link at the top, and I submitted its `week3` link on MOLE.
+- [x] `docs/week3/report.md` is in my repository with my PR link at the top, and I submitted its `week3` link on MOLE.

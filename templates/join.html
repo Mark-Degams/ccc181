@@ -20,11 +20,12 @@
       </div>
 
       <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input id="email" name="email" type="email" autocomplete="email" required
+        <label for="email" class="form-label">Email (optional)</label>
+        <input id="email" name="email" type="email" autocomplete="email"
                class="form-control {% if errors.email %}is-invalid{% endif %}"
                value="{{ form.get('email', '') }}"
-               {% if errors.email %}aria-describedby="email-error"{% endif %}>
+               aria-describedby="email-help{% if errors.email %} email-error{% endif %}">
+        <div id="email-help" class="form-text">Only used to contact you about your ticket.</div>
         {% if errors.email %}
           <div id="email-error" class="invalid-feedback">{{ errors.email }}</div>
         {% endif %}
