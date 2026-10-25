@@ -1,0 +1,94 @@
+/* CinemaTicketQ theme: red and white cinema style on top of Bootstrap */
+
+:root {
+  --cq-red: #D00000;
+  --cq-red-dark: #A00000;
+  --cq-yellow: #FFE600;
+  --bs-link-color: #C00000;
+  --bs-link-hover-color: #900000;
+}
+
+body {
+  font-family: "Poppins", "IBM Plex Sans", Arial, sans-serif;
+  background: #FFFFFF;
+}
+
+/* Navbar */
+.navbar.bg-primary {
+  background-color: var(--cq-red) !important;
+}
+.navbar[data-bs-theme="dark"] {
+  --bs-navbar-active-color: var(--cq-yellow);
+  --bs-navbar-hover-color: var(--cq-yellow);
+}
+.navbar-brand {
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.navbar .nav-link {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+/* Page headings: centered red, like a section header */
+main h1 {
+  color: var(--cq-red);
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* Buttons and pills */
+.btn-primary {
+  --bs-btn-bg: var(--cq-red);
+  --bs-btn-border-color: var(--cq-red);
+  --bs-btn-hover-bg: var(--cq-red-dark);
+  --bs-btn-hover-border-color: var(--cq-red-dark);
+  --bs-btn-active-bg: #800000;
+  --bs-btn-active-border-color: #800000;
+  --bs-btn-disabled-bg: var(--cq-red);
+  --bs-btn-disabled-border-color: var(--cq-red);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.nav-pills {
+  --bs-nav-pills-link-active-bg: var(--cq-red);
+}
+
+/* Touch targets: at least about 44px tall on phones */
+.btn,
+.nav-link,
+.form-control,
+.form-select {
+  min-height: 44px;
+}
+.btn,
+.form-control,
+.form-select {
+  border-radius: 0.5rem;
+}
+
+/* Home page hero */
+.hero {
+  border-top: 6px solid var(--cq-red);
+  border-bottom: 1px solid #E5E5E5;
+}
+.hero h1 {
+  font-size: 2.25rem;
+}
+
+/* My place: ticket stub */
+.ticket-card {
+  border: 2px dashed var(--cq-red);
+  border-radius: 1.25rem;
+}
+
+/* Staff table header */
+.table > thead > tr > * {
+  background-color: var(--cq-red);
+  color: #FFFFFF;
+  border-color: var(--cq-red);
+}
