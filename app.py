@@ -21,6 +21,22 @@ TICKETS = [
      "party_size": 2, "status": "waiting"},
     {"number": 2, "name": "Ben", "email": "ben@email.com", "service_id": 2,
      "party_size": 4, "status": "waiting"},
+    {"number": 3, "name": "Carla", "email": "carla@email.com", "service_id": 1,
+     "party_size": 3, "status": "waiting"},
+    {"number": 4, "name": "Dino", "email": "dino@email.com", "service_id": 1,
+     "party_size": 1, "status": "waiting"},
+    {"number": 5, "name": "Ella", "email": "ella@email.com", "service_id": 3,
+     "party_size": 2, "status": "waiting"},
+    {"number": 6, "name": "Francis", "email": "francis@email.com", "service_id": 1,
+     "party_size": 5, "status": "waiting"},
+    {"number": 7, "name": "Gina", "email": "gina@email.com", "service_id": 2,
+     "party_size": 2, "status": "waiting"},
+    {"number": 8, "name": "Henry", "email": "henry@email.com", "service_id": 1,
+     "party_size": 2, "status": "waiting"},
+    {"number": 9, "name": "Iris", "email": "iris@email.com", "service_id": 1,
+     "party_size": 4, "status": "waiting"},
+    {"number": 10, "name": "Jonas", "email": "jonas@email.com", "service_id": 1,
+     "party_size": 1, "status": "waiting"},
 ]
 
 MINUTES_PER_TICKET = 3  # average time to serve one person
@@ -88,8 +104,8 @@ def join():
     errors = {}
     if not name:
         errors["name"] = "Enter your name."
-    if "@" not in email or "." not in email:
-        errors["email"] = "Enter a valid email address."
+    if email and ("@" not in email or "." not in email):
+        errors["email"] = "Enter a valid email address, or leave it blank."
     if service_id not in [s["id"] for s in SERVICES]:
         errors["service_id"] = "Choose a service."
     if party_size is None or not 1 <= party_size <= 10:
