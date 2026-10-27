@@ -704,7 +704,7 @@ Commit it: `git commit -m "Add Week 3 report (#<issue>)"`. Then open your branch
 - [x] Usability test notes and the improvement are in `docs/week3/usability-test.md`.
 - [x] `docs/week3/report.md` is in your repository and displays correctly on GitHub.
 - [x] Your pull request is **merged** into `main` and tagged `week3`.
-- [ ] The link to your report at the `week3` tag is submitted to the **Week 3 assignment on MOLE** before the due date.
+- [x] The link to your report at the `week3` tag is submitted to the **Week 3 assignment on MOLE** before the due date.
 
 ---
 
