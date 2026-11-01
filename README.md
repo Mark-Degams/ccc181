@@ -2,6 +2,10 @@
 
 CinemaTicketQ is a queue management system for a cinema ticket booth in a mall. People scan a QR code on their phone to join the queue, see their ticket number and estimated wait, and roam the mall until their turn. Booth staff call, serve, or mark no-shows from a dashboard.
 
+## Requirements
+
+What CinemaTicketQ must do, with IDs, priorities and the MVP: [docs/requirements.md](docs/requirements.md)
+
 ## Project structure
 
 ```
