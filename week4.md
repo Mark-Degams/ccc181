@@ -453,10 +453,10 @@ At the `yourapp=#` prompt, type `SELECT version();` and press Enter. You should 
 
 **Checkpoint 4**
 
-- [ ] `docker compose ps` shows your database as **healthy**.
-- [ ] `SELECT version();` in psql shows PostgreSQL 17.
-- [ ] `compose.yaml` and `.env.example` are committed; `.env` is in `.gitignore` and not tracked.
-- [ ] Committed: `git commit -m "Run PostgreSQL in Docker Compose (#<issue>)"`
+- [x] `docker compose ps` shows your database as **healthy**.
+- [x] `SELECT version();` in psql shows PostgreSQL 17.
+- [x] `compose.yaml` and `.env.example` are committed; `.env` is in `.gitignore` and not tracked.
+- [x] Committed: `git commit -m "Run PostgreSQL in Docker Compose (#<issue>)"`
 
 ---
 
