@@ -651,10 +651,10 @@ Run `flask --app app seed`, then run it again. The second run must not add dupli
 
 **Checkpoint 6**
 
-- [ ] `\dt` lists all your tables, and `\d` for each one shows the constraints from your `schema.md`.
-- [ ] The `migrations/` folder is committed, including the script in `migrations/versions/`.
-- [ ] `flask --app app seed` adds your services and is safe to run twice.
-- [ ] Committed: `git commit -m "Add initial migration and seed command (#<issue>)"`
+- [x] `\dt` lists all your tables, and `\d` for each one shows the constraints from your `schema.md`.
+- [x] The `migrations/` folder is committed, including the script in `migrations/versions/`.
+- [x] `flask --app app seed` adds your services and is safe to run twice.
+- [x] Committed: `git commit -m "Add initial migration and seed command (#<issue>)"`
 
 ---
 

@@ -24,6 +24,22 @@ app.config["SQLALCHEMY_ECHO"] = os.environ.get("SQLALCHEMY_ECHO") == "1"
 db.init_app(app)
 migrate = Migrate(app, db)
 
+
+@app.cli.command("seed")
+def seed():
+    """Add the starting services if they are not there yet."""
+    starting = [
+        ("Buy tickets", 3),
+        ("Claim reserved tickets", 3),
+        ("Refund or exchange", 5),
+    ]
+    for name, minutes in starting:
+        exists = db.session.scalar(db.select(Service).filter_by(name=name))
+        if exists is None:
+            db.session.add(Service(name=name, avg_minutes=minutes))
+    db.session.commit()
+    print("Services are ready.")
+
 # Sample data for the demo. A real app would load this from a database later.
 SERVICES = [
     {"id": 1, "name": "Buy tickets"},
