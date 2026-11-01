@@ -587,10 +587,10 @@ migrate = Migrate(app, db)
 
 **Checkpoint 5**
 
-- [ ] `models.py` has a class for every table in your ERD, with the keys, constraints and relationships from your `schema.md`.
-- [ ] `requirements.txt` lists Flask-SQLAlchemy, Flask-Migrate, psycopg and python-dotenv with pinned versions.
-- [ ] `flask --app app routes` runs without errors.
-- [ ] Committed: `git commit -m "Add SQLAlchemy models (#<issue>)"`
+- [x] `models.py` has a class for every table in your ERD, with the keys, constraints and relationships from your `schema.md`.
+- [x] `requirements.txt` lists Flask-SQLAlchemy, Flask-Migrate, psycopg and python-dotenv with pinned versions.
+- [x] `flask --app app routes` runs without errors.
+- [x] Committed: `git commit -m "Add SQLAlchemy models (#<issue>)"`
 
 ---
 
