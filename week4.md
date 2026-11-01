@@ -730,11 +730,11 @@ The `try/except IntegrityError` is the database saying no. If two requests with 
 
 **Checkpoint 7**
 
-- [ ] The `SERVICES` and `TICKETS` lists are gone from `app.py`.
-- [ ] Joining creates a row in `tickets`, shown by `SELECT * FROM tickets;` in psql.
-- [ ] Joining twice with the same email (try different capital letters) creates two tickets but only one row in `users`.
-- [ ] An empty or invalid form still shows the Week 3 error messages and saves nothing.
-- [ ] Committed.
+- [x] The `SERVICES` and `TICKETS` lists are gone from `app.py`.
+- [x] Joining creates a row in `tickets`, shown by `SELECT * FROM tickets;` in psql.
+- [x] Joining twice with the same email (try different capital letters) creates two tickets but only one row in `users`.
+- [x] An empty or invalid form still shows the Week 3 error messages and saves nothing.
+- [x] Committed.
 
 ---
 

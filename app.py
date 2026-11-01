@@ -40,36 +40,6 @@ def seed():
     db.session.commit()
     print("Services are ready.")
 
-# Sample data for the demo. A real app would load this from a database later.
-SERVICES = [
-    {"id": 1, "name": "Buy tickets"},
-    {"id": 2, "name": "Claim reserved tickets"},
-    {"id": 3, "name": "Refund or exchange"},
-]
-
-TICKETS = [
-    {"number": 1, "name": "Ana", "email": "ana@email.com", "service_id": 1,
-     "party_size": 2, "status": "waiting"},
-    {"number": 2, "name": "Ben", "email": "ben@email.com", "service_id": 2,
-     "party_size": 4, "status": "waiting"},
-    {"number": 3, "name": "Carla", "email": "carla@email.com", "service_id": 1,
-     "party_size": 3, "status": "waiting"},
-    {"number": 4, "name": "Dino", "email": "dino@email.com", "service_id": 1,
-     "party_size": 1, "status": "waiting"},
-    {"number": 5, "name": "Ella", "email": "ella@email.com", "service_id": 3,
-     "party_size": 2, "status": "waiting"},
-    {"number": 6, "name": "Francis", "email": "francis@email.com", "service_id": 1,
-     "party_size": 5, "status": "waiting"},
-    {"number": 7, "name": "Gina", "email": "gina@email.com", "service_id": 2,
-     "party_size": 2, "status": "waiting"},
-    {"number": 8, "name": "Henry", "email": "henry@email.com", "service_id": 1,
-     "party_size": 2, "status": "waiting"},
-    {"number": 9, "name": "Iris", "email": "iris@email.com", "service_id": 1,
-     "party_size": 4, "status": "waiting"},
-    {"number": 10, "name": "Jonas", "email": "jonas@email.com", "service_id": 1,
-     "party_size": 1, "status": "waiting"},
-]
-
 MINUTES_PER_TICKET = 3  # average time to serve one person
 
 
@@ -119,9 +89,13 @@ def ticket_status(ticket_id):
             "wait_minutes": ahead * MINUTES_PER_TICKET}
 
 
+def all_services():
+    return db.session.scalars(db.select(Service).order_by(Service.name)).all()
+
+
 @app.get("/join")
 def join_form():
-    return render_template("join.html", services=SERVICES, form={}, errors={})
+    return render_template("join.html", services=all_services(), form={}, errors={})
 
 
 @app.post("/join")
@@ -131,28 +105,43 @@ def join():
     email = form.get("email", "").strip().lower()
     service_id = form.get("service_id", type=int)
     party_size = form.get("party_size", type=int)
+    service = db.session.get(Service, service_id) if service_id else None
 
     errors = {}
-    if not name:
-        errors["name"] = "Enter your name."
-    if email and ("@" not in email or "." not in email):
+    if not name or len(name) > 80:
+        errors["name"] = "Enter your name (up to 80 characters)."
+    if email and ("@" not in email or "." not in email or len(email) > 120):
         errors["email"] = "Enter a valid email address, or leave it blank."
-    if service_id not in [s["id"] for s in SERVICES]:
+    if service is None:
         errors["service_id"] = "Choose a service."
     if party_size is None or not 1 <= party_size <= 10:
         errors["party_size"] = "Enter a party size from 1 to 10."
 
     if errors:
         flash("Please fix the highlighted fields.", "danger")
-        return render_template("join.html", services=SERVICES, form=form,
-                               errors=errors), 400
+        return render_template("join.html", services=all_services(),
+                               form=form, errors=errors), 400
 
-    number = TICKETS[-1]["number"] + 1 if TICKETS else 1
-    TICKETS.append({"number": number, "name": name, "email": email,
-                    "service_id": service_id, "party_size": party_size,
-                    "status": "waiting"})
-    flash(f"You joined the queue. Your ticket is #{number}.", "success")
-    return redirect(url_for("ticket", ticket_id=number))
+    user = None
+    if email:
+        user = db.session.scalar(db.select(User).filter_by(email=email))
+    if user is None:
+        user = User(name=name, email=email or None)  # empty email is stored as NULL
+    else:
+        user.name = name  # same email, latest name wins (schema review, entry 4)
+
+    ticket = Ticket(user=user, service=service, party_size=party_size)
+    db.session.add(ticket)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        flash("Something went wrong saving your ticket. Please try again.", "danger")
+        return render_template("join.html", services=all_services(),
+                               form=form, errors={}), 409
+
+    flash(f"You joined the queue. Your ticket is #{ticket.id}.", "success")
+    return redirect(url_for("ticket", ticket_id=ticket.id))
 
 
 @app.get("/staff")
