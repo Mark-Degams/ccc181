@@ -11,7 +11,7 @@ from flask import Flask, abort, flash, redirect, render_template, request, url_f
 from flask_migrate import Migrate
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
-
+from datetime import datetime, timedelta, timezone
 from models import Service, Ticket, User, db
 
 load_dotenv()
@@ -40,8 +40,6 @@ def seed():
     db.session.commit()
     print("Services are ready.")
 
-MINUTES_PER_TICKET = 3  # average time to serve one person
-
 
 @app.route("/")
 def index():
@@ -52,45 +50,71 @@ def index():
 
 @app.get("/queue/<int:ticket_id>")
 def ticket(ticket_id):
-    t = next((t for t in TICKETS if t["number"] == ticket_id), None)
-    if t is None:
-        abort(404)
-    ahead = [x for x in TICKETS
-             if x["service_id"] == t["service_id"]
-             and x["status"] == "waiting"
-             and x["number"] < t["number"]]
-    service = next(s for s in SERVICES if s["id"] == t["service_id"])
-    wait_minutes = len(ahead) * MINUTES_PER_TICKET
-    return render_template("ticket.html", ticket=t, service=service,
-                           ahead=len(ahead), wait_minutes=wait_minutes)
-
-
-@app.post("/queue/<int:ticket_id>/leave")
-def leave_queue(ticket_id):
-    t = next((t for t in TICKETS if t["number"] == ticket_id), None)
-    if t is None:
-        abort(404)
-    if t["status"] in ("waiting", "called"):
-        t["status"] = "no-show"
-        flash(f"You left the queue. Ticket #{ticket_id} was cancelled.", "info")
-    return redirect(url_for("index"))
+    t = db.get_or_404(Ticket, ticket_id)
+    ahead = people_ahead(t)
+    wait, eta = estimate(t, ahead)
+    return render_template("ticket.html", ticket=t, service=t.service,
+                           ahead=ahead, wait_minutes=wait, eta=eta)
 
 
 @app.get("/queue/<int:ticket_id>/status.json")
 def ticket_status(ticket_id):
-    t = next((t for t in TICKETS if t["number"] == ticket_id), None)
-    if t is None:
-        abort(404)
-    ahead = sum(1 for x in TICKETS
-                if x["service_id"] == t["service_id"]
-                and x["status"] == "waiting"
-                and x["number"] < t["number"])
-    return {"status": t["status"], "ahead": ahead,
-            "wait_minutes": ahead * MINUTES_PER_TICKET}
+    t = db.get_or_404(Ticket, ticket_id)
+    ahead = people_ahead(t)
+    wait, eta = estimate(t, ahead)
+    return {"status": t.status, "ahead": ahead,
+            "wait_minutes": wait, "eta": clock_text(eta)}
 
 
 def all_services():
     return db.session.scalars(db.select(Service).order_by(Service.name)).all()
+
+
+PH_TIME = timezone(timedelta(hours=8))  # Philippine time has no daylight saving
+
+
+@app.template_filter("local")
+def local_time(value):
+    """Show a database time in Philippine time, e.g. Nov 01, 08:01 PM."""
+    return value.astimezone(PH_TIME).strftime("%b %d, %I:%M %p") if value else ""
+
+
+@app.template_filter("clock")
+def clock_text(value):
+    """Clock time only, e.g. 2:35 PM."""
+    return value.astimezone(PH_TIME).strftime("%I:%M %p").lstrip("0")
+
+
+def people_ahead(t):
+    """Count tickets still waiting for the same service that joined before t."""
+    stmt = (db.select(func.count())
+            .select_from(Ticket)
+            .where(Ticket.service_id == t.service_id,
+                   Ticket.status == "waiting",
+                   Ticket.created_at < t.created_at))
+    return db.session.scalar(stmt)
+
+
+def minutes_per_person(service):
+    """FR-14: average of the last 10 served tickets, else the service's avg_minutes."""
+    stmt = (db.select(Ticket.called_at, Ticket.served_at)
+            .where(Ticket.service_id == service.id,
+                   Ticket.status == "served",
+                   Ticket.served_at > Ticket.called_at)
+            .order_by(Ticket.served_at.desc())
+            .limit(10))
+    rows = db.session.execute(stmt).all()
+    if not rows:
+        return service.avg_minutes
+    seconds = sum((served - called).total_seconds() for called, served in rows)
+    return seconds / len(rows) / 60
+
+
+def estimate(t, ahead):
+    """Return (wait in minutes, expected clock time) for a ticket."""
+    wait = round(ahead * minutes_per_person(t.service))
+    eta = datetime.now(timezone.utc) + timedelta(minutes=wait)
+    return wait, eta
 
 
 @app.get("/join")
@@ -147,46 +171,78 @@ def join():
 @app.get("/staff")
 def staff_dashboard():
     service_id = request.args.get("service_id", type=int)
-    queue = [t for t in TICKETS if t["status"] in ("waiting", "called")]
-    waiting_counts = {
-        s["id"]: sum(1 for t in queue
-                     if t["service_id"] == s["id"] and t["status"] == "waiting")
-        for s in SERVICES
-    }
-    total_waiting = sum(waiting_counts.values())
+    stmt = (db.select(Ticket)
+            .where(Ticket.status.in_(["waiting", "called"]))
+            .order_by(Ticket.created_at))
     if service_id:
-        queue = [t for t in queue if t["service_id"] == service_id]
-    names = {s["id"]: s["name"] for s in SERVICES}
-    return render_template("staff.html", queue=queue, services=SERVICES,
-                           names=names, selected=service_id,
+        stmt = stmt.where(Ticket.service_id == service_id)
+    queue = db.session.scalars(stmt).all()
+
+    services = all_services()
+    counts = dict(db.session.execute(
+        db.select(Ticket.service_id, func.count())
+        .where(Ticket.status == "waiting")
+        .group_by(Ticket.service_id)).all())
+    waiting_counts = {s.id: counts.get(s.id, 0) for s in services}
+    selected_service = db.session.get(Service, service_id) if service_id else None
+
+    return render_template("staff.html", queue=queue, services=services,
+                           selected=service_id, selected_service=selected_service,
                            waiting_counts=waiting_counts,
-                           total_waiting=total_waiting)
+                           total_waiting=sum(waiting_counts.values()))
+
+
+STAFF_ACTIONS = {"serve": "served", "no-show": "no-show"}
 
 
 @app.post("/staff/call-next")
 def call_next():
     service_id = request.form.get("service_id", type=int)
-    nxt = next((t for t in TICKETS
-                if t["status"] == "waiting"
-                and (not service_id or t["service_id"] == service_id)), None)
+    stmt = (db.select(Ticket)
+            .where(Ticket.status == "waiting")
+            .order_by(Ticket.created_at)
+            .limit(1))
+    if service_id:
+        stmt = stmt.where(Ticket.service_id == service_id)
+    nxt = db.session.scalar(stmt)
     if nxt is None:
         flash("No one is waiting.", "warning")
     else:
-        nxt["status"] = "called"
-        flash(f"Calling ticket #{nxt['number']} ({nxt['name']}).", "info")
+        nxt.status = "called"
+        nxt.called_at = func.now()  # the database fills in the time
+        db.session.commit()
+        flash(f"Calling ticket #{nxt.id} ({nxt.user.name}).", "info")
     return redirect(url_for("staff_dashboard", service_id=service_id))
 
 
 @app.post("/staff/tickets/<int:ticket_id>/<action>")
 def staff_action(ticket_id, action):
-    new_status = {"serve": "served", "no-show": "no-show"}.get(action)
-    t = next((t for t in TICKETS if t["number"] == ticket_id), None)
-    if t is None or new_status is None:
+    new_status = STAFF_ACTIONS.get(action)
+    if new_status is None:
         abort(404)
-    t["status"] = new_status
-    flash(f"Ticket #{ticket_id} marked {new_status}.", "info")
+    t = db.get_or_404(Ticket, ticket_id)
+    if t.status in ("waiting", "called"):
+        if new_status == "served":
+            if t.called_at is None:
+                t.called_at = func.now()  # served straight from waiting: set both times
+            t.served_at = func.now()
+        t.status = new_status
+        db.session.commit()
+        flash(f"Ticket #{ticket_id} marked {new_status}.", "info")
+    else:
+        flash(f"Ticket #{ticket_id} is already {t.status}.", "warning")
     service_id = request.form.get("service_id", type=int)
     return redirect(url_for("staff_dashboard", service_id=service_id))
+
+
+@app.post("/queue/<int:ticket_id>/leave")
+def leave_queue(ticket_id):
+    t = db.get_or_404(Ticket, ticket_id)
+    if t.status in ("waiting", "called"):
+        t.status = "left"  # soft delete: the row stays for reports (FR-12)
+        db.session.commit()
+        flash("You left the queue.", "info")
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":

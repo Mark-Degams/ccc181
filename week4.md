@@ -819,11 +819,11 @@ Do not use the old `Ticket.query` style you may find online. It is legacy in SQL
 
 **Checkpoint 8**
 
-- [ ] My place shows the number, service, status, position and the time joined, read from the database.
-- [ ] `/queue/99999` shows a 404 page, not a server error.
-- [ ] The staff dashboard lists waiting and called tickets in the order they joined, filters by service, and shows each person's name through `t.user.name`.
-- [ ] No `position` column exists anywhere in your schema.
-- [ ] Committed.
+- [x] My place shows the number, service, status, position and the time joined, read from the database.
+- [x] `/queue/99999` shows a 404 page, not a server error.
+- [x] The staff dashboard lists waiting and called tickets in the order they joined, filters by service, and shows each person's name through `t.user.name`.
+- [x] No `position` column exists anywhere in your schema.
+- [x] Committed.
 
 ---
 
