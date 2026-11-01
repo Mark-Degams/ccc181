@@ -70,6 +70,11 @@ def all_services():
     return db.session.scalars(db.select(Service).order_by(Service.name)).all()
 
 
+def active_services():
+    stmt = db.select(Service).filter_by(active=True).order_by(Service.name)
+    return db.session.scalars(stmt).all()
+
+
 PH_TIME = timezone(timedelta(hours=8))  # Philippine time has no daylight saving
 
 
@@ -119,7 +124,7 @@ def estimate(t, ahead):
 
 @app.get("/join")
 def join_form():
-    return render_template("join.html", services=all_services(), form={}, errors={})
+    return render_template("join.html", services=active_services(), form={}, errors={})
 
 
 @app.post("/join")
@@ -136,14 +141,14 @@ def join():
         errors["name"] = "Enter your name (up to 80 characters)."
     if email and ("@" not in email or "." not in email or len(email) > 120):
         errors["email"] = "Enter a valid email address, or leave it blank."
-    if service is None:
+    if service is None or not service.active:
         errors["service_id"] = "Choose a service."
     if party_size is None or not 1 <= party_size <= 10:
         errors["party_size"] = "Enter a party size from 1 to 10."
 
     if errors:
         flash("Please fix the highlighted fields.", "danger")
-        return render_template("join.html", services=all_services(),
+        return render_template("join.html", services=active_services(),
                                form=form, errors=errors), 400
 
     user = None
@@ -161,7 +166,7 @@ def join():
     except IntegrityError:
         db.session.rollback()
         flash("Something went wrong saving your ticket. Please try again.", "danger")
-        return render_template("join.html", services=all_services(),
+        return render_template("join.html", services=active_services(),  # CHANGED
                                form=form, errors={}), 409
 
     flash(f"You joined the queue. Your ticket is #{ticket.id}.", "success")
@@ -243,6 +248,70 @@ def leave_queue(ticket_id):
         db.session.commit()
         flash("You left the queue.", "info")
     return redirect(url_for("index"))
+
+
+@app.post("/staff/tickets/<int:ticket_id>/delete")
+def delete_ticket(ticket_id):
+    t = db.get_or_404(Ticket, ticket_id)
+    db.session.delete(t)  # hard delete: the row is gone for good
+    db.session.commit()
+    flash(f"Ticket #{ticket_id} was deleted.", "warning")
+    return redirect(url_for("staff_dashboard"))
+
+
+@app.get("/staff/services")
+def services_list():
+    return render_template("services.html", services=all_services())
+
+
+@app.post("/staff/services")
+def service_create():
+    name = request.form.get("name", "").strip()
+    minutes = request.form.get("avg_minutes", type=int)
+    if not name or len(name) > 60 or not minutes or minutes <= 0:
+        flash("Enter a name (up to 60 characters) and minutes greater than 0.", "danger")
+        return redirect(url_for("services_list"))
+    db.session.add(Service(name=name, avg_minutes=minutes))
+    try:
+        db.session.commit()
+        flash(f"Service “{name}” added.", "success")
+    except IntegrityError:
+        db.session.rollback()
+        flash(f"A service named “{name}” already exists.", "danger")
+    return redirect(url_for("services_list"))
+
+
+@app.post("/staff/services/<int:service_id>/edit")
+def service_edit(service_id):
+    s = db.get_or_404(Service, service_id)
+    name = request.form.get("name", "").strip()
+    minutes = request.form.get("avg_minutes", type=int)
+    if not name or len(name) > 60 or not minutes or minutes <= 0:
+        flash("Enter a name (up to 60 characters) and minutes greater than 0.", "danger")
+        return redirect(url_for("services_list"))
+    s.name = name
+    s.avg_minutes = minutes
+    s.active = request.form.get("active") == "on"  # an unticked box is not sent at all
+    try:
+        db.session.commit()
+        flash(f"Service “{name}” saved.", "success")
+    except IntegrityError:
+        db.session.rollback()
+        flash(f"A service named “{name}” already exists.", "danger")
+    return redirect(url_for("services_list"))
+
+
+@app.post("/staff/services/<int:service_id>/delete")
+def service_delete(service_id):
+    s = db.get_or_404(Service, service_id)
+    if s.tickets:
+        flash(f"“{s.name}” has tickets, so it cannot be deleted. Turn it off instead.", "danger")
+        return redirect(url_for("services_list"))
+    name = s.name
+    db.session.delete(s)
+    db.session.commit()
+    flash(f"Service “{name}” deleted.", "warning")
+    return redirect(url_for("services_list"))
 
 
 if __name__ == "__main__":

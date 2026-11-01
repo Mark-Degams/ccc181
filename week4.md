@@ -971,13 +971,13 @@ Staff login comes in Week 11. For now the staff pages are open. Create a GitHub 
 
 **Checkpoint 9**
 
-- [ ] Call next, Serve and No-show change the status in the database, and calling sets `called_at`.
-- [ ] Leaving the queue sets the status to `left`, and the row is still in `tickets`.
-- [ ] A mistaken ticket can be hard-deleted from the dashboard, after a confirmation.
-- [ ] The second migration is committed, and `downgrade` then `upgrade` both work.
-- [ ] Manage services can create, update, switch off and delete a service; deleting a service with tickets is refused with a clear message; a switched-off service no longer appears on the join form.
-- [ ] Every route that changes data is a POST.
-- [ ] Committed.
+- [x] Call next, Serve and No-show change the status in the database, and calling sets `called_at`.
+- [x] Leaving the queue sets the status to `left`, and the row is still in `tickets`.
+- [x] A mistaken ticket can be hard-deleted from the dashboard, after a confirmation.
+- [x] The second migration is committed, and `downgrade` then `upgrade` both work.
+- [x] Manage services can create, update, switch off and delete a service; deleting a service with tickets is refused with a clear message; a switched-off service no longer appears on the join form.
+- [x] Every route that changes data is a POST.
+- [x] Committed.
 
 ---
 
