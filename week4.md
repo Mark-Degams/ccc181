@@ -319,11 +319,11 @@ If the answer to any of these is yes, split that data into its own table and lin
 
 **Checkpoint 2**
 
-- [ ] `docs/week4/schema.md` has the nouns table, the full types-and-constraints table, the relationship sentences, the delete rules, and the normalization answers.
-- [ ] The ERD has at least three related tables, with PKs, FKs and every relationship labelled.
-- [ ] Your schema uses PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE, CHECK and `timestamptz` at least once each.
-- [ ] No column stores a result that can be computed, such as a position in line.
-- [ ] Committed: `git commit -m "Add Week 4 schema design and ERD (#<issue>)"`
+- [x] `docs/week4/schema.md` has the nouns table, the full types-and-constraints table, the relationship sentences, the delete rules, and the normalization answers.
+- [x] The ERD has at least three related tables, with PKs, FKs and every relationship labelled.
+- [x] Your schema uses PRIMARY KEY, FOREIGN KEY, NOT NULL, UNIQUE, CHECK and `timestamptz` at least once each.
+- [x] No column stores a result that can be computed, such as a position in line.
+- [x] Committed: `git commit -m "Add Week 4 schema design and ERD (#<issue>)"`
 
 ---
 
