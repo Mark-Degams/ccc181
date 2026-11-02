@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Manage services · CinemaTicketQ{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">Manage services</h1>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <h2 class="h5">Add a service</h2>
+    <form method="post" action="{{ url_for('service_create') }}" class="row g-2 align-items-end">
+      <div class="col-12 col-md-6">
+        <label for="new-name" class="form-label">Name</label>
+        <input id="new-name" name="name" type="text" maxlength="60" required class="form-control">
+      </div>
+      <div class="col-6 col-md-3">
+        <label for="new-minutes" class="form-label">Minutes per person</label>
+        <input id="new-minutes" name="avg_minutes" type="number" min="1" value="3" required class="form-control">
+      </div>
+      <div class="col-6 col-md-3">
+        <button type="submit" class="btn btn-primary w-100">Add service</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table class="table align-middle">
+    <caption>All services, including switched-off ones</caption>
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Minutes per person</th>
+        <th scope="col">Active</th>
+        <th scope="col">Tickets</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in services %}
+      <tr>
+        <td>
+          <label for="name-{{ s.id }}" class="visually-hidden">Name of {{ s.name }}</label>
+          <input id="name-{{ s.id }}" name="name" form="edit-{{ s.id }}" type="text"
+                 maxlength="60" required value="{{ s.name }}" class="form-control">
+        </td>
+        <td>
+          <label for="min-{{ s.id }}" class="visually-hidden">Minutes per person for {{ s.name }}</label>
+          <input id="min-{{ s.id }}" name="avg_minutes" form="edit-{{ s.id }}" type="number"
+                 min="1" required value="{{ s.avg_minutes }}" class="form-control">
+        </td>
+        <td>
+          <div class="form-check">
+            <input id="active-{{ s.id }}" name="active" form="edit-{{ s.id }}" type="checkbox"
+                   class="form-check-input" {% if s.active %}checked{% endif %}>
+            <label for="active-{{ s.id }}" class="form-check-label">
+              {{ "Active" if s.active else "Off" }}
+            </label>
+          </div>
+        </td>
+        <td>{{ s.tickets|length }}</td>
+        <td class="text-nowrap">
+          <form id="edit-{{ s.id }}" method="post"
+                action="{{ url_for('service_edit', service_id=s.id) }}" class="d-inline">
+            <button type="submit" class="btn btn-sm btn-primary"
+                    aria-label="Save {{ s.name }}">Save</button>
+          </form>
+          <form method="post" action="{{ url_for('service_delete', service_id=s.id) }}"
+                class="d-inline ms-2"
+                data-confirm="Delete the service {{ s.name }}? This cannot be undone.">
+            <button type="submit" class="btn btn-sm btn-outline-danger"
+                    aria-label="Delete {{ s.name }}">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p><a href="{{ url_for('staff_dashboard') }}">Back to the staff dashboard</a></p>
+{% endblock %}
